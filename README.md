@@ -4,6 +4,7 @@ Clicker Empire Game
 
 # URL
 
+https://yasuhironagahama.github.io/Clicker-Empire-Game/
 
 # Explain
 
