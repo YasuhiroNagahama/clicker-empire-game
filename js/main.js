@@ -149,7 +149,7 @@ class GameData {
 
     alert("ゲームを開始します。");
 
-    startGame();
+    HambergerGame.startGame();
   }
 }
 
