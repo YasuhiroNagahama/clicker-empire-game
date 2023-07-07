@@ -448,7 +448,7 @@ class Game {
   }
 
   static startNewGame(enteredName) {
-    const userInfo = new User(enteredName, 20, 0, 100000000);
+    const userInfo = new User(enteredName, 20, 0, 50000);
     const etf = new ETF(0, 0, 0, userInfo);
     const hamburger = new Hamburger(0, 25, userInfo);
     const items = [
