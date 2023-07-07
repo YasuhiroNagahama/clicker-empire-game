@@ -1,467 +1,696 @@
-// 各ページのidを取得し、オブジェクトとして保存
-const configPage = {
-  loginPage: document.getElementById("page-type-login"),
-  homePage: document.getElementById("page-type-home"),
-  purchasePage: document.getElementById("page-type-purchase"),
+const config = {
+  top: document.getElementById("loginPage"),
+  game: document.getElementById("gamePage"),
+  modal: document.getElementById("modalPage"),
 };
 
-// 変更が必要な要素を取得し、オブジェクトとして保存
-const configData = {
-  hambergerQty: document.getElementById("hamberger-count"),
-  moneyPerClick: document.getElementById("hamberger-per-click"),
-  moneyPerSecond: document.getElementById("hamberger-per-second"),
-  userName: document.getElementById("input-name"),
-  userNameWrap: document.getElementById("user-info-name"),
-  userDays: document.getElementById("user-info-days"),
-  userAge: document.getElementById("user-info-age"),
-  userMoney: document.getElementById("user-info-money"),
-  userStocks: document.getElementById("user-stocks"),
-  userBonds: document.getElementById("user-bonds"),
-  shopItemList: document.querySelectorAll(".user-shop-item"),
-  stockPriceData: document.getElementById("stocks-price-data"),
-  stockPrice: document.getElementById("stocks-price"),
-};
-
-class Display {
-  // 引数の要素を表示するメソッド
-  static showElement(element) {
-    element.classList.remove("d-none");
-    element.classList.add("d-flex");
+class Page {
+  static removePage(page) {
+    page.classList.add("d-none");
   }
 
-  // 引数の要素を非表示にするメソッド
-  static hideElement(element) {
-    element.classList.remove("d-flex");
-    element.classList.add("d-none");
+  static addPage(page) {
+    page.classList.remove("d-none");
   }
 }
 
-class GameData {
-  // ゲームデータの初期化処理をするメソッド
-  static initialize() {
-    configData.hambergerQty.innerHTML = "0";
-    configData.moneyPerClick.innerHTML = "25";
-    configData.moneyPerSecond.innerHTML = "0";
-    configData.userDays.innerHTML = "0";
-    configData.userAge.innerHTML = "20";
-    configData.userMoney.innerHTML = "50000";
-    configData.userStocks.innerHTML = "0";
-    configData.userBonds.innerHTML = "0";
-    configData.stockPriceData.dataset.price = "300000";
-    configData.stockPrice.innerHTML = "$ 300000";
+class ETF {
+  constructor(etfStocks, etfBonds, perSecond, userInfo) {
+    this.etfStocks = etfStocks;
+    this.etfBonds = etfBonds;
+    this.perSecond = perSecond;
+    this.user = userInfo;
+
+    // 初期値
+    this.stocksRatio = 0.001;
+    this.bondsRatio = 0.0007;
+
+    // ETFクラス内の複数のメソッドで使用するIDを取得し、メンバ変数に保存
+    this.perSecondElement = document.getElementById("perSecond");
+
+    this.setPerSecond();
+    this.updateUserMoneyPerSecond();
   }
 
-  // セーブボタンを押した時の処理をするメソッド
-  static clickSaveBtn() {
-    const saveBtn = document.getElementById("save-btn");
+  initialize() {
+    this.stocksRatio = 0.001;
+    this.bondsRatio = 0.0007;
+    this.etfStocks = 0;
+    this.etfBonds = 0;
+    this.perSecond = 0;
 
-    saveBtn.addEventListener("click", function () {
-      if (!confirm("ゲームデータをセーブしますか？")) return false;
+    this.setPerSecond();
+  }
 
-      const itemQtyList = [];
+  setPerSecond() {
+    this.perSecondElement.innerHTML = String(this.perSecond);
+  }
 
-      for (let i = 0; i < configData.shopItemList.length; i++) {
-        const itemQty = document.getElementById(String(i));
-        itemQtyList.push(itemQty.innerHTML);
-      }
-
-      const gameDataList = {};
-
-      for (const [key, value] of Object.entries(configData)) {
-        if (key == "stockPriceData") {
-          gameDataList[key] = value.dataset.price;
-        } else if (
-          key != "userName" &&
-          key != "userNameWrap" &&
-          key != "shopItemList"
-        ) {
-          gameDataList[key] = value.innerHTML;
-        }
-      }
-
-      gameDataList["itemQtyList"] = itemQtyList;
-
-      localStorage.setItem(
-        configData.userName.value,
-        JSON.stringify(gameDataList)
+  updateUserMoneyPerSecond() {
+    setInterval(() => {
+      this.user.addUserMoney(
+        this.etfStocks * this.stocksRatio +
+          this.etfBonds * this.bondsRatio +
+          this.perSecond
       );
-
-      alert("ゲームデータをセーブしました。");
-    });
-  }
-
-  // リセットボタンを押した時の処理をするメソッド
-  static clickResetBtn() {
-    const resetBtn = document.getElementById("reset-btn");
-
-    resetBtn.addEventListener("click", function () {
-      if (!confirm("ゲームデータをリセットしますか？")) return false;
-
-      for (let i = 0; i < configData.shopItemList.length; i++) {
-        const itemQty = document.getElementById(String(i));
-        itemQty.innerHTML = "0";
-      }
-
-      GameData.initialize();
-
-      alert("ゲームデータをリセットしました。");
-    });
-  }
-
-  // 既存のゲームデータをロードするメソッド
-  static loadGame() {
-    const data = JSON.parse(localStorage.getItem(configData.userName.value));
-
-    if (data == null) {
-      alert("入力した名前のデータは存在しません。");
-      return false;
-    }
-
-    for (let i = 0; i < configData.shopItemList.length; i++) {
-      document.getElementById(String(i)).innerHTML = data["itemQtyList"][i];
-    }
-
-    for (const [key, value] of Object.entries(configData)) {
-      if (key == "stockPriceData") {
-        value.dataset.price = data[key];
-      } else if (
-        key != "userName" &&
-        key != "userNameWrap" &&
-        key != "shopItemList"
-      ) {
-        value.innerHTML = data[key];
-      }
-    }
-
-    alert("ゲームを開始します。");
-
-    HambergerGame.startGame();
-  }
-
-  // 新しくゲームを始めて良いか判定するメソッド
-  static newGame() {
-    const data = JSON.parse(localStorage.getItem(configData.userName.value));
-
-    if (data != null) {
-      alert("入力した名前のデータはすでに存在しています。");
-      return false;
-    }
-
-    alert("ゲームを開始します。");
-
-    HambergerGame.startGame();
-  }
-}
-
-class HambergerGame {
-  // dataListのタイプがボンドの時の購入処理を行うメソッド
-  static bondsTypePurchase() {
-    const qtyTotal = document.getElementById("quantity-total");
-
-    configData.userBonds.innerHTML =
-      Number(configData.userBonds.innerHTML) + Number(qtyTotal.innerHTML);
-  }
-
-  // dataListのタイプがストックの時の購入処理を行うメソッド
-  static stockTypePurchase(price) {
-    const qtyTotal = document.getElementById("quantity-total");
-
-    configData.userStocks.innerHTML =
-      Number(configData.userStocks.innerHTML) + Number(qtyTotal.innerHTML);
-    configData.stockPriceData.dataset.price = Math.floor(Number(price) * 1.1);
-    configData.stockPrice.innerHTML = "$ " + Math.floor(Number(price) * 1.1);
-  }
-
-  // dataListのタイプがセカンドの時の購入処理を行うメソッド
-  static secondTypePurchase(get) {
-    const merchQty = document.getElementById("merchandise-quantity");
-
-    configData.moneyPerSecond.innerHTML =
-      Number(configData.moneyPerSecond.innerHTML) +
-      Number(merchQty.value) * Number(get);
-  }
-
-  // dataListのタイプがクリックの時の購入処理を行うメソッド
-  static clickTypePurchase(get) {
-    const merchQty = document.getElementById("merchandise-quantity");
-
-    configData.moneyPerClick.innerHTML =
-      Number(configData.moneyPerClick.innerHTML) +
-      Number(merchQty.value) * Number(get);
-  }
-
-  // 購入処理をするメソッド
-  static purchaseProcessing(dataList) {
-    const merchQty = document.getElementById("merchandise-quantity");
-    const qtyTotal = document.getElementById("quantity-total");
-    const itemQty = document.getElementById(dataList["productIndex"]);
-
-    if (dataList.type == "click") {
-      HambergerGame.clickTypePurchase(dataList.get);
-    } else if (dataList.type == "second") {
-      HambergerGame.secondTypePurchase(dataList.get);
-    } else if (dataList.type == "stocks") {
-      HambergerGame.stockTypePurchase(dataList.price);
-    } else if (dataList.type == "bonds") {
-      HambergerGame.bondsTypePurchase();
-    }
-
-    // アイテム所持数を更新
-    itemQty.innerHTML = Number(itemQty.innerHTML) + Number(merchQty.value);
-
-    // ユーザーの所持金を更新
-    configData.userMoney.innerHTML =
-      Number(configData.userMoney.innerHTML) - Number(qtyTotal.innerHTML);
-  }
-
-  // 購入ページでパーチェスボタンを押した時に購入処理をして良いか判定するメソッド
-  static clickPurchaseBtn(dataList) {
-    const purchaseBtn = document.getElementById("purchase");
-    const merchQty = document.getElementById("merchandise-quantity");
-    const qtyTotal = document.getElementById("quantity-total");
-    const itemQty = document.getElementById(dataList.productIndex);
-
-    purchaseBtn.addEventListener("click", function () {
-      if (!merchQty.value || Number(merchQty.value) <= 0) {
-        alert("1つ以上購入してください。");
-      } else if (Number(merchQty.value) > Number(dataList.max)) {
-        alert("購入数の上限を超えています。");
-      } else if (
-        Number(qtyTotal.innerHTML) > Number(configData.userMoney.innerHTML)
-      ) {
-        alert("現在の手持ちでは購入できません。");
-      } else if (merchQty.value.includes(".")) {
-        alert("小数では購入できません。");
-      } else if (
-        Number(merchQty.value) + Number(itemQty.innerHTML) >
-        Number(dataList.max)
-      ) {
-        alert("所持数と足し合わせた数が購入数の上限を超えています。");
-      } else if (confirm("購入しますか？")) {
-        HambergerGame.purchaseProcessing(dataList);
-
-        configPage.homePage.classList.remove("pe-none", "opacity-50");
-        Display.hideElement(configPage.purchasePage);
-      }
-    });
-  }
-
-  // 購入ページでバックボタンを押した時の処理を行うメソッド
-  static clickGoBackBtn() {
-    const goBackBtn = document.getElementById("goback");
-    goBackBtn.addEventListener("click", function () {
-      configPage.homePage.classList.remove("pe-none", "opacity-50");
-      Display.hideElement(configPage.purchasePage);
-    });
-  }
-
-  // 合計金額を計算し、要素に代入するメソッド
-  static totalPrice(dataList) {
-    const merchQty = document.getElementById("merchandise-quantity");
-    const qtyTotal = document.getElementById("quantity-total");
-
-    merchQty.addEventListener("input", function () {
-      if (Number(merchQty.value) <= 0) {
-        qtyTotal.innerHTML = "0";
-      } else if (
-        !merchQty.value.includes(".") &&
-        Number(merchQty.value) <= Number(dataList.max)
-      ) {
-        qtyTotal.innerHTML = Number(merchQty.value) * Number(dataList.price);
-      }
-    });
-  }
-
-  // 購入ページを作るメソッド
-  static createPurchasePage(dataList) {
-    const lastSentence =
-      dataList.type == "stocks"
-        ? "of total stocks"
-        : dataList.type == "bonds"
-        ? "of total bonds"
-        : "per " + dataList.type;
-
-    configPage.purchasePage.innerHTML = `
-  <div
-  class="merchandise-info-wrapper d-flex justify-content-center align-items-center gap-5"
->
-  <div class="merchandise-info-desc">
-    <h1 class="merchandise-name h1 border-bottom border-4 border-dark">${
-      dataList.productName
-    }</h1>
-    <ul class="merchandise-about-list h4 fw-bold d-flex flex-column gap-2">
-      <li class="merchandise-about-item">Max Purchase : ${dataList.max}</li>
-      <li class="merchandise-about-item">Price : $ ${Number(
-        dataList.price
-      )}</li>
-      <li class="merchandise-about-item">Get : $ ${
-        dataList.get
-      } ${lastSentence}</li>
-    </ul>
-  </div>
-  <div class="marchandise-img-wrapper border border-4 border-secondary">
-    <img src="${
-      dataList.img
-    }" alt="" class="marchandise-img p-4" width="180" height="180" />
-  </div>
-</div>
-<div
-  class="merchandise-quantity-wrapper d-flex justify-content-center align-items-end flex-column gap-3"
->
-  <h1 class="merchandise-quantity-text h4 fw-bold">
-    How many would you like to purchase?
-  </h1>
-  <input
-    id="merchandise-quantity"
-    class="border border-4 border-dark w-100 text-end p-2 h4"
-    type="number"
-    min="0"
-    max="${dataList.max}"
-    step="5"
-  />
-  <p id="quantity-total"
-    class="merchandise-quantity-total h4 border-bottom border-4 border-dark pb-2"
-  >
-  0
-  </p>
-</div>
-<div
-  class="merchandise-button-wrapper d-flex justify-content-center align-items-between gap-5"
->
-  <button
-    id="goback"
-    class="merchandese-button bg-white border border-2 border-secondary rounded fw-bold h3 p-2"
-  >
-    Go Back
-  </button>
-  <button
-    id="purchase"
-    class="merchandese-button bg-dark border border-2 border-secondary rounded fw-bold text-white h3 p-2"
-  >
-    Purchase
-  </button>
-  `;
-
-    configPage.homePage.classList.add("pe-none", "opacity-50");
-    Display.showElement(configPage.purchasePage);
-
-    HambergerGame.totalPrice(dataList);
-    HambergerGame.clickGoBackBtn();
-    HambergerGame.clickPurchaseBtn(dataList);
-  }
-
-  // アイテムクリック時の処理をするメソッド
-  static itemClickProcessing() {
-    for (let i = 0; i < configData.shopItemList.length; i++) {
-      configData.shopItemList[i].addEventListener("click", function () {
-        const dataList = {
-          type: this.dataset.type,
-          max: this.dataset.max,
-          price: this.dataset.price,
-          get: this.dataset.get,
-          img: this.dataset.img,
-          productName: this.dataset.name,
-          productIndex: this.dataset.index,
-        };
-
-        HambergerGame.createPurchasePage(dataList);
-      });
-    }
-  }
-
-  // ユーザーの所持金を1秒ごとに更新するメソッド
-  static updateUserMoneyPerSecond() {
-    if (configData.moneyPerSecond.innerHTML != "0") {
-      configData.userMoney.innerHTML =
-        Number(configData.userMoney.innerHTML) +
-        Number(configData.moneyPerSecond.innerHTML);
-    }
-
-    if (configData.userStocks.innerHTML != "0") {
-      configData.userMoney.innerHTML =
-        Number(configData.userMoney.innerHTML) +
-        Math.floor(Number(configData.userStocks.innerHTML) * 0.001);
-    }
-
-    if (configData.userBonds.innerHTML != "0") {
-      configData.userMoney.innerHTML =
-        Number(configData.userMoney.innerHTML) +
-        Math.floor(Number(configData.userBonds.innerHTML) * 0.0007);
-    }
-  }
-
-  // ユーザーの所持金をクリック毎に更新するメソッド
-  static updateUserHandheldPerClick() {
-    configData.userMoney.innerHTML =
-      Number(configData.userMoney.innerHTML) +
-      Number(configData.moneyPerClick.innerHTML);
-  }
-
-  // ハンバーガーの数をクリック毎に更新するメソッド
-  static updateHambergerAmountPerClick() {
-    const hambergerImg = document.querySelector(".hamberger-img");
-
-    hambergerImg.addEventListener("click", function () {
-      configData.hambergerQty.innerHTML =
-        Number(configData.hambergerQty.innerHTML) + 1;
-      HambergerGame.updateUserHandheldPerClick();
-    });
-  }
-
-  // ユーザーの年齢を更新するメソッド
-  static updateUserAge() {
-    configData.userAge.innerHTML = Number(configData.userAge.innerHTML) + 1;
-  }
-
-  // 日にちを1秒ごとに更新するメソッド
-  static updateUserDaysPerSecond() {
-    setInterval(function () {
-      const days = Number(configData.userDays.innerHTML) + 1;
-      configData.userDays.innerHTML = days;
-
-      if (days % 365 == 0) {
-        HambergerGame.updateUserAge();
-      }
-
-      HambergerGame.updateUserMoneyPerSecond();
     }, 1000);
   }
 
-  // ゲームをスタートするメソッド
-  static startGame() {
-    configData.userNameWrap.innerHTML = configData.userName.value;
+  updatePerSecondInfo() {
+    this.perSecondElement.innerHTML = String(
+      this.etfStocks * this.stocksRatio +
+        this.etfBonds * this.bondsRatio +
+        this.perSecond
+    );
+  }
 
-    Display.hideElement(configPage.loginPage);
-    Display.showElement(configPage.homePage);
+  addEtfStocks(total) {
+    this.etfStocks += total;
 
-    HambergerGame.updateUserDaysPerSecond();
-    HambergerGame.updateHambergerAmountPerClick();
-    HambergerGame.itemClickProcessing();
+    this.updatePerSecondInfo();
+  }
+
+  addEtfBonds(total) {
+    this.etfBonds += total;
+
+    this.updatePerSecondInfo();
+  }
+
+  addPerSecond(money, quantity) {
+    const total = money * quantity;
+    this.perSecond += total;
+
+    this.updatePerSecondInfo();
   }
 }
 
-//ハンバーガークリック中のアニメーションをする関数
-function clickAnimation() {
-  const hambergerImg = document.querySelector(".hamberger-img");
-  hambergerImg.classList.add("is-active");
-}
+class User {
+  constructor(userName, userAge, userDays, userMoney) {
+    this.userName = userName;
+    this.userAge = userAge;
+    this.userDays = userDays;
+    this.userMoney = userMoney;
 
-// ハンバーガークリックが外れた時のアニメーションをする関数
-function notClickAnimation() {
-  const hambergerImg = document.querySelector(".hamberger-img");
-  hambergerImg.classList.remove("is-active");
-}
+    // Userクラス内の複数のメソッドで使用するIDを取得し、メンバ変数に保存
+    this.userNameElement = document.getElementById("userName");
+    this.userAgeElement = document.getElementById("userAge");
+    this.userDaysElement = document.getElementById("userDays");
+    this.userMoneyElement = document.getElementById("userMoney");
 
-// ホームページに移って良いか判定する関数
-function submitCheck(gameType) {
-  if (configData.userName.value == "") {
-    alert("名前を入力してください。");
-  } else if (gameType == "start") {
-    GameData.newGame();
-  } else if (gameType == "login") {
-    GameData.loadGame();
+    // 初期化処理の自動実行
+    this.setUserInfo();
+    this.setUserName();
+    this.updateUserDays();
+  }
+
+  initialize() {
+    this.userAge = 20;
+    this.userDays = 0;
+    this.userMoney = 50000;
+
+    this.setUserInfo();
+  }
+
+  setUserInfo() {
+    this.userNameElement.innerHTML = String(this.userName);
+
+    this.userAgeElement.innerHTML = String(this.userAge);
+
+    this.userMoneyElement.innerHTML = String(this.userMoney);
+  }
+
+  setUserName() {
+    this.userNameElement.innerHTML = String(this.userName);
+  }
+
+  updateUserDays() {
+    this.userDaysElement.innerHTML = this.userDays;
+
+    setInterval(() => {
+      this.userDays++;
+      this.userDaysElement.innerHTML = String(this.userDays);
+
+      this.updateUserAge();
+    }, 1000);
+  }
+
+  updateUserAge() {
+    if (this.userDays % 365 == 0) {
+      this.userAge++;
+      this.userAgeElement.innerHTML = String(this.userAge);
+    }
+  }
+
+  addUserMoney(money) {
+    this.userMoney += money;
+    this.userMoneyElement.innerHTML = String(this.userMoney);
+  }
+
+  removeUserMoney(money) {
+    this.userMoney -= money;
+    this.userMoneyElement.innerHTML = String(this.userMoney);
   }
 }
 
-GameData.clickSaveBtn();
-GameData.clickResetBtn();
+class Hamburger {
+  constructor(clickCount, perClick, user) {
+    this.clickCount = clickCount;
+    this.perClick = perClick;
+    this.user = user;
+
+    // Hamburgerクラス内の複数のメソッドで使用するIDを取得し、メンバ変数に保存
+    this.burgersElement = document.getElementById("burgers");
+    this.perClickElement = document.getElementById("perClick");
+    this.perSecondElement = document.getElementById("perSecond");
+    this.hamburgerBtn = document.getElementById("hamburgerBtn");
+
+    // 初期化処理の自動実行
+    this.setHamburgerInfo();
+    this.hamburgerClickAnimation();
+    this.updateClickCount();
+  }
+
+  initialize() {
+    this.clickCount = 0;
+    this.perClick = 25;
+
+    this.setHamburgerInfo();
+  }
+
+  setHamburgerInfo() {
+    this.burgersElement.innerHTML = String(this.clickCount);
+    this.perClickElement.innerHTML = String(this.perClick);
+  }
+
+  hamburgerClickAnimation() {
+    this.hamburgerBtn.addEventListener("mousedown", () => {
+      this.hamburgerBtn.style.transform = "scale(1.1, 1.1)";
+    });
+    this.hamburgerBtn.addEventListener("mouseup", () => {
+      this.hamburgerBtn.style.transform = "scale(1, 1)";
+    });
+  }
+
+  updateClickCount() {
+    this.hamburgerBtn.addEventListener("click", () => {
+      this.clickCount++;
+      this.burgersElement.innerHTML = String(this.clickCount);
+
+      this.user.addUserMoney(this.perClick);
+    });
+  }
+
+  addPerClick(money, quantity) {
+    const total = money * quantity;
+
+    this.perClick += total;
+    this.perClickElement.innerHTML = String(this.perClick);
+  }
+}
+
+class Item {
+  constructor(
+    itemName,
+    itemType,
+    itemEffect,
+    itemMax,
+    itemDesc,
+    itemPrice,
+    itemImg,
+    user,
+    hamburger,
+    etf
+  ) {
+    this.itemName = itemName;
+    this.itemType = itemType;
+    this.itemEffect = itemEffect;
+    this.itemMax = itemMax;
+    this.itemDesc = itemDesc;
+    this.itemPrice = itemPrice;
+    this.itemImg = itemImg;
+
+    // インスタンス
+    this.user = user;
+    this.hamburger = hamburger;
+    this.etf = etf;
+
+    // 初期値
+    this.purchaseNumber = 0;
+
+    // 初期化処理の自動化
+    this.createItemElement();
+  }
+
+  initialize() {
+    this.purchaseNumber = 0;
+  }
+
+  createItemElement() {
+    const itemListElement = document.getElementById("itemList");
+    const itemElement = document.createElement("li");
+    itemElement.classList.add(
+      "hamburger-game_shop_item",
+      "d-flex",
+      "justify-content-between",
+      "align-items-center",
+      "gap-4",
+      "bg-white",
+      "border",
+      "border-secondary",
+      "border-4",
+      "px-2"
+    );
+
+    itemElement.innerHTML = `
+      <div class="hamburger-game_shop_img-wrapper">
+        <img
+          src="${this.itemImg}"
+          alt="${this.itemName}"
+          class="hamburger-game_shop_img"
+        />
+      </div>
+      <p class="hamburger-game_shop_type text-dark h4 fw-bold">
+        ${this.itemName}
+      </p>
+    `;
+
+    itemListElement.append(itemElement);
+
+    itemElement.addEventListener("click", () => {
+      window.scroll({ top: 0, behavior: "smooth" });
+      this.createModalPage();
+      this.pushPurchaseBtn();
+      this.pushBackBtn();
+    });
+  }
+
+  createModalPage() {
+    Page.addPage(config.modal);
+
+    config.modal.innerHTML = `
+    <div class="hamburger-game_modal_list-wrapper">
+        <ul
+          class="hamburger-game_modal_list d-flex justify-content-center align-items-start flex-column gap-3"
+        >
+          <li class="hamburger-game_modal_item h3 fw-bold">
+            Name&nbsp;:&nbsp;<span
+              class="border-bottom border-2 border-dark"
+              >${this.itemName}</span
+            >
+          </li>
+          <li class="hamburger-game_modal_item h3 fw-bold">
+            Type&nbsp;:&nbsp;<span
+              class="border-bottom border-2 border-dark"
+              >${this.itemType}</span
+            >
+          </li>
+          <li class="hamburger-game_modal_item h3 fw-bold">
+            Price&nbsp;:&nbsp;$<span
+              class="border-bottom border-2 border-dark"
+              >${this.itemPrice}</span
+            >
+          </li>
+          <li class="hamburger-game_modal_item h3 fw-bold">
+            Purchase Number&nbsp;:&nbsp;<span
+              class="border-bottom border-2 border-dark"
+              ><span id="purchaseNumber">${this.purchaseNumber}</span>&nbsp;/&nbsp;<span>${this.itemMax}</span
+              ></span
+            >
+          </li>
+          <li class="hamburger-game_modal_item h4 fw-bold">
+            Description&nbsp;:&nbsp;<span>${this.itemDesc}</span
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="hamburger-game_modal_input-wrapper border border-2 border-dark">
+        <input class="hamburger-game_modal_input h3 fw-bold p-2" id="modalInput" type="number" dir="rtl">
+      </div>
+      <div
+        class="hamburger-game_modal_btn-wrapper d-flex justify-content-center align-items-center gap-5"
+      >
+        <button id="backBtn" class="hamburger-game_modal_btn">
+          <i class="fa-sharp fa-solid fa-delete-left h1"></i>
+        </button>
+        <button id="purchaseBtn" class="hamburger-game_modal_btn">
+          <i class="fa-solid fa-cart-shopping h1"></i>
+        </button>
+      </div>
+    `;
+  }
+
+  totalChecker(total) {
+    if (this.user.userMoney < total) {
+      alert("所持金が足りません。");
+      return true;
+    }
+
+    return false;
+  }
+
+  quantityChecker(quantity) {
+    try {
+      if (quantity <= 0) throw "1個以上購入してください。";
+      else if (quantity > this.itemMax)
+        throw "個数が最大可能購入数より大きいです。";
+      else if (quantity + this.purchaseNumber > this.itemMax)
+        throw "個数と今までの購入数の合計が最大可能購入数より大きいです。";
+    } catch (error) {
+      alert(error);
+      return true;
+    }
+
+    return false;
+  }
+
+  processThePurchase() {
+    const quantity = Number(document.getElementById("modalInput").value);
+    if (this.quantityChecker(quantity)) return false;
+
+    const total = this.itemPrice * quantity;
+    if (this.totalChecker(total)) return false;
+
+    if (this.itemType === "ability") {
+      this.hamburger.addPerClick(this.itemEffect, quantity);
+    } else if (this.itemType === "stock") {
+      this.etf.addEtfStocks(total);
+      this.itemPrice += this.itemPrice * 0.1;
+    } else if (this.itemType === "bonds") {
+      this.etf.addEtfBonds(total);
+    } else {
+      this.etf.addPerSecond(this.itemEffect, quantity);
+    }
+
+    // userMoneyから購入額を差し引く
+    this.user.removeUserMoney(total);
+    // アイテム購入数を更新
+    this.purchaseNumber += quantity;
+
+    Page.removePage(config.modal);
+    config.modal.innerHTML = "";
+  }
+
+  pushPurchaseBtn() {
+    const purchaseBtn = document.getElementById("purchaseBtn");
+
+    purchaseBtn.addEventListener("click", () => {
+      this.processThePurchase();
+    });
+  }
+
+  pushBackBtn() {
+    const backBtn = document.getElementById("backBtn");
+
+    backBtn.addEventListener("click", () => {
+      Page.removePage(config.modal);
+      config.modal.innerHTML = "";
+    });
+  }
+}
+
+class Game {
+  static initializeGame(userInfo, etf, hamburger, items) {
+    const resetBtn = document.getElementById("resetBtn");
+
+    resetBtn.addEventListener("click", () => {
+      if (!confirm("ゲーム進行状況をリセットしますか?")) return false;
+
+      alert("ゲーム進行状況をリセットしました。");
+
+      userInfo.initialize();
+      etf.initialize();
+      hamburger.initialize();
+      items.forEach((item) => item.initialize());
+    });
+  }
+
+  static saveGameDataToJson(userName, userInfo, etf, hamburger, items) {
+    const gameData = {
+      userName: userName,
+      userInfo: userInfo,
+      etf: etf,
+      hamburger: hamburger,
+      items: items,
+    };
+
+    localStorage.setItem(userName, JSON.stringify(gameData));
+  }
+
+  static saveGame(userName, userInfo, etf, hamburger, items) {
+    const saveBtn = document.getElementById("saveBtn");
+
+    saveBtn.addEventListener("click", () => {
+      if (!confirm("ゲーム進行状況をセーブしますか?")) return false;
+      console.log("ゲーム進行状況をセーブする処理を実装中。");
+
+      Game.saveGameDataToJson(userName, userInfo, etf, hamburger, items);
+    });
+  }
+
+  static startNewGame(enteredName) {
+    const userInfo = new User(enteredName, 20, 0, 100000000);
+    const etf = new ETF(0, 0, 0, userInfo);
+    const hamburger = new Hamburger(0, 25, userInfo);
+    const items = [
+      new Item(
+        "Flip machine",
+        "ability",
+        25,
+        500,
+        "グリルをクリックごとに 25 円を取得します。",
+        15000,
+        "img/hamburger_machine.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "ETF Stock",
+        "stock",
+        300000,
+        Infinity,
+        "ETF 銘柄の購入分をまとめて加算し、毎秒 0.1% を取得します。",
+        300000,
+        "img/KK.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "ETF Bonds",
+        "bonds",
+        300000,
+        Infinity,
+        "債券 ETF の購入分をまとめて加算し、毎秒 0.07% を取得します。",
+        300000,
+        "img/bond.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "Lemonade Stand",
+        "estates",
+        30,
+        1000,
+        "毎秒 30 円を取得します。",
+        30000,
+        "img/lemonade.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "Ice Cream Truck",
+        "estates",
+        120,
+        500,
+        "毎秒 120 円を取得します。",
+        100000,
+        "img/ice.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "House",
+        "estates",
+        32000,
+        100,
+        "毎秒 32,000 円を取得します。",
+        20000000,
+        "img/house.jpg",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "TownHouse",
+        "estates",
+        64000,
+        100,
+        "毎秒 64,000 円を取得します。",
+        40000000,
+        "img/city_house.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "Mansion",
+        "estates",
+        500000,
+        20,
+        "毎秒 500,000 円を取得します。",
+        250000000,
+        "img/mansion.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "Industrial Space",
+        "estates",
+        2200000,
+        10,
+        "毎秒 2,200,000 円を取得します。",
+        1000000000,
+        "img/industry.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "Hotel Skyscraper",
+        "estates",
+        25000000,
+        5,
+        "毎秒 25,000,000 円を取得します。",
+        10000000000,
+        "img/hotel.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+      new Item(
+        "Bullet-Speed Sky Railway",
+        "estates",
+        30000000000,
+        1,
+        "毎秒 30,000,000,000 円を取得します。",
+        10000000000000,
+        "img/train.png",
+        userInfo,
+        hamburger,
+        etf
+      ),
+    ];
+
+    Page.removePage(config.top);
+    Page.addPage(config.game);
+
+    Game.initializeGame(userInfo, etf, hamburger, items);
+    Game.saveGame(enteredName, userInfo, etf, hamburger, items);
+  }
+
+  static loadGame(enteredName) {
+    const gameData = JSON.parse(localStorage.getItem(enteredName));
+
+    const userInfo = new User(
+      enteredName,
+      gameData.userInfo.userAge,
+      gameData.userInfo.userDays,
+      gameData.userInfo.userMoney
+    );
+
+    const etf = new ETF(
+      gameData.etf.etfStocks,
+      gameData.etf.etfBonds,
+      gameData.etf.perSecond,
+      userInfo
+    );
+
+    const hamburger = new Hamburger(
+      gameData.hamburger.clickCount,
+      gameData.hamburger.perClick,
+      userInfo
+    );
+
+    const items = [];
+
+    gameData.items.forEach((item) => {
+      if (item.itemMax == null) item.itemMax = Infinity;
+
+      const itemInstance = new Item(
+        item.itemName,
+        item.itemType,
+        item.itemEffect,
+        item.itemMax,
+        item.itemDesc,
+        item.itemPrice,
+        item.itemImg,
+        userInfo,
+        hamburger,
+        etf
+      );
+
+      itemInstance.purchaseNumber = item.purchaseNumber;
+
+      items.push(itemInstance);
+    });
+
+    Page.removePage(config.top);
+    Page.addPage(config.game);
+
+    Game.initializeGame(userInfo, etf, hamburger, items);
+    Game.saveGame(enteredName, userInfo, etf, hamburger, items);
+  }
+
+  static isEmpty(value) {
+    if (value == "") {
+      alert("名前を入力してください。");
+      return true;
+    }
+
+    return false;
+  }
+
+  static dataExist(enteredName) {
+    return JSON.parse(localStorage.getItem(enteredName)) !== null;
+  }
+
+  static pushNewBtn() {
+    const newBtn = document.getElementById("newBtn");
+
+    newBtn.addEventListener("click", () => {
+      const enteredName = document.getElementById("inputName").value;
+
+      if (Game.isEmpty(enteredName)) return false;
+      if (Game.dataExist(enteredName)) {
+        alert("入力した名前のデータは既に存在しています。");
+        return false;
+      }
+
+      Game.startNewGame(enteredName);
+    });
+  }
+
+  static pushLoginBtn() {
+    const loginBtn = document.getElementById("loginBtn");
+
+    loginBtn.addEventListener("click", () => {
+      const enteredName = document.getElementById("inputName").value;
+
+      if (Game.isEmpty(enteredName)) return false;
+      if (!Game.dataExist(enteredName)) {
+        alert("入力した名前のデータは存在しません。");
+        return false;
+      }
+
+      Game.loadGame(enteredName);
+    });
+  }
+}
+
+Game.pushLoginBtn();
+Game.pushNewBtn();

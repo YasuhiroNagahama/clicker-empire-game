@@ -14,7 +14,7 @@
       crossorigin="anonymous"
     />
 
-    <!-- googlefontsの読み込み -->
+    <!-- google fontsの読み込み -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -38,7 +38,7 @@
   <body>
     <!-- ログインページ -->
     <div
-      id="page-type-login"
+      id="loginPage"
       class="login-page d-flex justify-content-center align-items-center vh-100"
     >
       <div
@@ -53,496 +53,145 @@
           onsubmit="event.preventDefault()"
         >
           <input
-            id="input-name"
+            id="inputName"
             placeholder="YourName"
             type="text"
             value=""
-            class="username-input h3 border border-3 border-dark p-4"
+            class="username-input h3 border border-3 border-dark p-4 w-75"
           />
           <div class="button-wrapper d-flex gap-5">
-            <button
-              class="form-button new-button h2 fw-bold p-2"
-              onclick="submitCheck('start')"
-            >
-              New
-            </button>
-            <button
-              class="form-button login-button h2 fw-bold p-2"
-              onclick="submitCheck('login')"
-            >
+            <button id="newBtn" class="form-button h2 fw-bold p-2">New</button>
+            <button id="loginBtn" class="form-button h2 fw-bold p-2">
               Login
             </button>
           </div>
         </form>
       </div>
     </div>
-    <!-- ホームページ -->
+    <!-- ゲームページ -->
     <div
-      id="page-type-home"
-      class="home-page position-relative bg-dark d-none justify-content-center align-items-center flex-wrap gap-4 p-4"
+      id="gamePage"
+      class="hamburger-game-wrapper p-4 bg-dark text-white d-none d-flex justify-content-center align-items-center gap-4 w-100 position-relative"
     >
-      <div class="hamberger-info-wrapper">
-        <div
-          class="hamberger-info bg-white px-5 py-2 text-center mb-4 border border-4 border-secondary rounded"
+      <div class="hamburger-game_btn-wrapper position-absolute d-flex gap-3">
+        <button
+          draggable="true"
+          id="resetBtn"
+          class="hamburger-game_btn h1 bg-white text-dark border border-dark border-2"
         >
-          <p class="fw-bold h2"><span id="hamberger-count">0</span> Burgers</p>
-          <p class="fw-bold h4">
-            <span id="hamberger-per-click">25</span> per click
-          </p>
-          <p class="fw-bold h4">
-            <span id="hamberger-per-second">0</span> per second
-          </p>
-          <p class="fw-bold h4"><span id="user-stocks">0</span> stocks</p>
-          <p class="fw-bold h4"><span id="user-bonds">0</span> bonds</p>
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+        <button
+          draggable="true"
+          id="saveBtn"
+          class="hamburger-game_btn h1 bg-white text-dark border border-dark border-2"
+        >
+          <i class="fa-sharp fa-solid fa-floppy-disk"></i>
+        </button>
+      </div>
+      <div
+        class="hamburger-game_left d-flex justify-content-center align-content-center flex-column gap-3 w-100 h-100"
+      >
+        <div class="hamburger-game_info-wrapper">
+          <ul
+            class="hamburger-game_info_list border border-white border-4 d-flex justify-content-center align-items-center flex-column gap-2 py-4"
+          >
+            <li class="hamburger-game_info_item h1 fw-bold">
+              <span id="burgers" class="hamburger-game_info-burgers"></span>
+              &nbsp;Burgers
+            </li>
+            <li class="hamburger-game_info_item h2 fw-bold">
+              $&nbsp;<span
+                id="perClick"
+                class="hamburger-game_info-burgers"
+              ></span>
+              &nbsp;per click
+            </li>
+            <li class="hamburger-game_info_item h2 fw-bold">
+              $&nbsp;<span
+                id="perSecond"
+                class="hamburger-game_info-burgers"
+              ></span>
+              &nbsp;per second
+            </li>
+          </ul>
         </div>
         <div
-          class="hamberger-img-wrapper d-flex justify-content-center align-items-center border border-4 border-secondary p-5"
+          class="hamburger-game_img-wrapper border border-white border-4 d-flex justify-content-center align-items-center w-100 h-100"
         >
           <img
-            src="img/hamberger_normal.png"
-            alt=""
-            class="hamberger-img"
-            width="250"
-            height="250"
-            onmousedown="clickAnimation()"
-            onmouseup="notClickAnimation()"
-            ontouchstart="clickAnimation()"
-            ontouchend="notClickAnimation()"
+            id="hamburgerBtn"
+            src="img/hamburger_click.png"
+            alt="hamburger"
+            class="hamburger-game_img w-75 h-75"
+            width="391"
+            height="400"
           />
         </div>
       </div>
-      <div class="hamberger-main-wrapper d-flex flex-column gap-4">
+      <div
+        class="hamburger-game_right w-100 d-flex justify-content-center align-content-center flex-column gap-3"
+      >
         <div
-          class="user-info-wrapper bg-white rounded border border-4 border-secondary"
+          class="hamburger-game_user-info-wrapper border border-white border-4 py-2"
         >
-          <ul
-            class="user-info-list d-flex flex-wrap justify-content-center align-items-center gap-2 p-2"
-          >
-            <li
-              class="user-info-item overflow-scroll h2 border border-4 border-dark rounded p-2 text-center"
+          <table>
+            <tbody
+              class="d-flex justify-content-center align-items-center flex-column gap-2"
             >
-              <span id="user-info-name"></span>
-            </li>
-            <li
-              class="user-info-item overflow-scroll h2 border border-4 border-dark rounded p-2 text-center"
-            >
-              <span id="user-info-days">0</span> days
-            </li>
-            <li
-              class="user-info-item overflow-scroll h2 border border-4 border-dark rounded p-2 text-center"
-            >
-              <span id="user-info-age">20</span> year old
-            </li>
-            <li
-              class="user-info-item overflow-scroll h2 border border-4 border-dark rounded p-2 text-center"
-            >
-              $<span id="user-info-money">50000</span>
-            </li>
-            <li class="icon-wrapper d-flex gap-2">
-              <i
-              id="save-btn"
-                class="fa-solid fa-floppy-disk h1 border border-2 border-secondary bg-dark text-white d-flex justify-content-center align-items-center game-button"
-              ></i>
-              <i
-              id="reset-btn"
-                class="fa-solid fa-rotate-right h1 border border-2 border-secondary bg-dark text-white d-flex justify-content-center align-items-center game-button"
-              ></i>
-            </li>
-          </ul>
+              <tr
+                class="d-flex justify-content-center align-items-center gap-3"
+              >
+                <td
+                  class="hamburger-game_user-info-item h4 fw-bold text-center border border-2 border-white p-2"
+                >
+                  <span id="userName" class="hamburger-game_user-info-name"
+                    >userName</span
+                  >
+                </td>
+                <td
+                  class="hamburger-game_user-info-item h4 fw-bold text-center border border-2 border-white p-2"
+                >
+                  <span id="userAge" class="hamburger-game_user-info-age"></span
+                  >&nbsp;years old
+                </td>
+              </tr>
+              <tr
+                class="d-flex justify-content-center align-items-center gap-3"
+              >
+                <td
+                  class="hamburger-game_user-info-item h4 fw-bold text-center border border-2 border-white p-2"
+                >
+                  <span
+                    id="userDays"
+                    class="hamburger-game_user-info-days"
+                  ></span
+                  >&nbsp;days
+                </td>
+                <td
+                  class="hamburger-game_user-info-item h4 fw-bold text-center border border-2 border-white p-2"
+                >
+                  $&nbsp;<span
+                    id="userMoney"
+                    class="hamburger-game_user-info-money"
+                  ></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div
-          class="user-shop-list-wrapper border border-4 border-secondary overflow-scroll"
-        >
-          <ul class="user-shop-list d-flex flex-column gap-4 p-4">
-            <li
-              data-type="click"
-              data-max="500"
-              data-price="15000"
-              data-get="25"
-              data-img="img/hamberger_machine.png"
-              data-name="Flip machine"
-              data-index="0"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/hamberger_machine.png"
-                  alt="マシーン"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">Flip machine</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 15000<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 25 per click</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 500
-                </p>
-              </div>
-              <p id="0" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="stocks"
-              data-max="Infinity"
-              data-price="300000"
-              data-get="0.1%"
-              data-img="img/KK.png"
-              data-name="ETF Stock"
-              data-index="1"
-              id="stocks-price-data"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/KK.png"
-                  alt="株"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">ETF Stock</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  <span id="stocks-price">$ 300000</span
-                  ><span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 0.1% of total ETF stocks</span
-                  >
-                </p>
-              </div>
-              <p id="1" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="bonds"
-              data-max="Infinity"
-              data-price="300000"
-              data-get="0.07%"
-              data-img="img/bond.png"
-              data-name="ETF Bonds"
-              data-index="2"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/bond.png"
-                  alt="債券"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">ETF Bonds</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 300000<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 0.07% of total ETF bonds</span
-                  >
-                </p>
-              </div>
-              <p id="2" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="second"
-              data-max="1000"
-              data-price="30000"
-              data-get="30"
-              data-img="img/lemonade.png"
-              data-name="Lemonade Stand"
-              data-index="3"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/lemonade.png"
-                  alt="レモネード"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">Lemonade Stand</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 30000<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 30 per second</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 1200
-                </p>
-              </div>
-              <p id="3" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="second"
-              data-max="500"
-              data-price="120000"
-              data-get="120"
-              data-img="img/icecream.png"
-              data-name="Ice Cream Truck"
-              data-index="4"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/icecream.png"
-                  alt="アイス"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">Ice Cream Truck</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $120000<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 120 per second</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 500
-                </p>
-              </div>
-              <p id="4" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="second"
-              data-max="100"
-              data-price="20000000"
-              data-get="32000"
-              data-img="img/home.jpg"
-              data-name="House"
-              data-index="5"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/home.jpg"
-                  alt="家"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">House</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 2e07<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 32000 per second</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 120
-                </p>
-              </div>
-              <p id="5" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="second"
-              data-max="100"
-              data-price="40000000"
-              data-get="64000"
-              data-img="img/city_house.png"
-              data-name="TownHouse"
-              data-index="6"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/city_house.png"
-                  alt="都会の家"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">TownHouse</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 4e07<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 64000 per second</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 120
-                </p>
-              </div>
-              <p id="6" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="second"
-              data-max="20"
-              data-price="250000000"
-              data-get="500000"
-              data-img="img/mansion.png"
-              data-name="Mansion"
-              data-index="7"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/mansion.png"
-                  alt="マンション"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">Mansion</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 25e07<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 500000 per second</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 20
-                </p>
-              </div>
-              <p id="7" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="second"
-              data-max="10"
-              data-price="1000000000"
-              data-get="2200000"
-              data-img="img/industry.png"
-              data-name="Industrial Space"
-              data-index="8"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/industry.png"
-                  alt="産業"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">Industrial Space</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 1e09<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 2200000 per second</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 10
-                </p>
-              </div>
-              <p id="8" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="second"
-              data-max="5"
-              data-price="10000000000"
-              data-get="25000000"
-              data-img="img/hotel.png"
-              data-name="Hotel Skyscraper"
-              data-index="9"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/hotel.png"
-                  alt="ホテル"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">Hotel Skyscraper</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 1e10<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 25000000 per second</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 5
-                </p>
-              </div>
-              <p id="9" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-            <li
-              data-type="second"
-              data-max="1"
-              data-price="10000000000000"
-              data-get="30000000000"
-              data-img="img/shinkansen.png"
-              data-name="Bullet-Speed Sky Railway"
-              data-index="0"
-              class="user-shop-item overflow-scroll bg-white rounded border border-5 border-secondary d-flex justify-content-between align-items-center p-4"
-            >
-              <div class="shop-item-img-wrapper">
-                <img
-                  src="img/shinkansen.png"
-                  alt="新幹線"
-                  class="shop-item-img"
-                  width="120"
-                  height="120"
-                />
-              </div>
-              <div class="shop-item-about-wrapper">
-                <h1 class="shop-item-name h3">Bullet-Speed Sky Railway</h1>
-                <p
-                  class="shop-item-price h4 d-flex justify-content-center align-items-center gap-4"
-                >
-                  $ 1e13<span
-                    class="text-success h6 pb-1 border-bottom border-2 border-success"
-                    >+$ 30000000000 per second</span
-                  >
-                </p>
-                <p class="shop-item-note text-danger">
-                  ※ Maximum number of purchases is 1
-                </p>
-              </div>
-              <p id="10" class="h1 border-bottom border-4 border-dark">0</p>
-            </li>
-          </ul>
+        <div class="hamburger-game_shop-wrapper border border-white border-4">
+          <ul
+            id="itemList"
+            class="hamburger-game_shop_list d-flex justify-content-start align-items-center flex-column gap-2 py-2"
+          ></ul>
         </div>
       </div>
     </div>
-    <!-- 購入ページ -->
+    <!-- モーダルページ -->
     <div
-      id="page-type-purchase"
-      class="purchase-page position-fixed d-none justify-content-center align-items-center flex-column gap-4 p-2 bg-white overflow-scroll border border-4 border-dark"
+      id="modalPage"
+      class="hamburger-game_modal-wrapper bg-white border border-4 border-success rounded p-5 d-none d-flex justify-content-center align-items-center flex-column gap-3 position-absolute"
     ></div>
   </body>
 </html>
