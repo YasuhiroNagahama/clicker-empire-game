@@ -5,12 +5,80 @@ const config = {
 };
 
 class Page {
-  static removePage(page) {
+  static hidePage(page) {
     page.classList.add("d-none");
   }
 
-  static addPage(page) {
+  static showPage(page) {
     page.classList.remove("d-none");
+  }
+}
+
+class User {
+  constructor(userName, userAge, userDays, userMoney) {
+    this.userName = userName;
+    this.userAge = userAge;
+    this.userDays = userDays;
+    this.userMoney = userMoney;
+
+    // Userクラス内の複数のメソッドで使用するIDを取得し、メンバ変数に保存
+    this.userNameElement = document.getElementById("userName");
+    this.userAgeElement = document.getElementById("userAge");
+    this.userDaysElement = document.getElementById("userDays");
+    this.userMoneyElement = document.getElementById("userMoney");
+
+    // 初期化処理の自動実行
+    this.setUserInfo();
+    this.setUserName();
+    this.updateUserDays();
+  }
+
+  initialize() {
+    this.userAge = 20;
+    this.userDays = 0;
+    this.userMoney = 50000;
+
+    this.setUserInfo();
+  }
+
+  setUserInfo() {
+    this.userNameElement.innerHTML = String(this.userName);
+
+    this.userAgeElement.innerHTML = String(this.userAge);
+
+    this.userMoneyElement.innerHTML = String(this.userMoney);
+  }
+
+  setUserName() {
+    this.userNameElement.innerHTML = String(this.userName);
+  }
+
+  updateUserDays() {
+    this.userDaysElement.innerHTML = String(this.userDays);
+
+    setInterval(() => {
+      this.userDays++;
+      this.userDaysElement.innerHTML = String(this.userDays);
+
+      this.updateUserAge();
+    }, 1000);
+  }
+
+  updateUserAge() {
+    if (this.userDays % 365 == 0) {
+      this.userAge++;
+      this.userAgeElement.innerHTML = String(this.userAge);
+    }
+  }
+
+  addUserMoney(money) {
+    this.userMoney += money;
+    this.userMoneyElement.innerHTML = String(this.userMoney);
+  }
+
+  removeUserMoney(money) {
+    this.userMoney -= money;
+    this.userMoneyElement.innerHTML = String(this.userMoney);
   }
 }
 
@@ -19,9 +87,10 @@ class ETF {
     this.etfStocks = etfStocks;
     this.etfBonds = etfBonds;
     this.perSecond = perSecond;
+    // インスタンス
     this.user = userInfo;
 
-    // 初期値
+    // 規定値
     this.stocksRatio = 0.001;
     this.bondsRatio = 0.0007;
 
@@ -33,8 +102,6 @@ class ETF {
   }
 
   initialize() {
-    this.stocksRatio = 0.001;
-    this.bondsRatio = 0.0007;
     this.etfStocks = 0;
     this.etfBonds = 0;
     this.perSecond = 0;
@@ -84,78 +151,11 @@ class ETF {
   }
 }
 
-class User {
-  constructor(userName, userAge, userDays, userMoney) {
-    this.userName = userName;
-    this.userAge = userAge;
-    this.userDays = userDays;
-    this.userMoney = userMoney;
-
-    // Userクラス内の複数のメソッドで使用するIDを取得し、メンバ変数に保存
-    this.userNameElement = document.getElementById("userName");
-    this.userAgeElement = document.getElementById("userAge");
-    this.userDaysElement = document.getElementById("userDays");
-    this.userMoneyElement = document.getElementById("userMoney");
-
-    // 初期化処理の自動実行
-    this.setUserInfo();
-    this.setUserName();
-    this.updateUserDays();
-  }
-
-  initialize() {
-    this.userAge = 20;
-    this.userDays = 0;
-    this.userMoney = 50000;
-
-    this.setUserInfo();
-  }
-
-  setUserInfo() {
-    this.userNameElement.innerHTML = String(this.userName);
-
-    this.userAgeElement.innerHTML = String(this.userAge);
-
-    this.userMoneyElement.innerHTML = String(this.userMoney);
-  }
-
-  setUserName() {
-    this.userNameElement.innerHTML = String(this.userName);
-  }
-
-  updateUserDays() {
-    this.userDaysElement.innerHTML = this.userDays;
-
-    setInterval(() => {
-      this.userDays++;
-      this.userDaysElement.innerHTML = String(this.userDays);
-
-      this.updateUserAge();
-    }, 1000);
-  }
-
-  updateUserAge() {
-    if (this.userDays % 365 == 0) {
-      this.userAge++;
-      this.userAgeElement.innerHTML = String(this.userAge);
-    }
-  }
-
-  addUserMoney(money) {
-    this.userMoney += money;
-    this.userMoneyElement.innerHTML = String(this.userMoney);
-  }
-
-  removeUserMoney(money) {
-    this.userMoney -= money;
-    this.userMoneyElement.innerHTML = String(this.userMoney);
-  }
-}
-
 class Hamburger {
   constructor(clickCount, perClick, user) {
     this.clickCount = clickCount;
     this.perClick = perClick;
+    // 以下インスタンス
     this.user = user;
 
     // Hamburgerクラス内の複数のメソッドで使用するIDを取得し、メンバ変数に保存
@@ -200,8 +200,8 @@ class Hamburger {
     });
   }
 
-  addPerClick(money, quantity) {
-    const total = money * quantity;
+  addPerClick(price, quantity) {
+    const total = price * quantity;
 
     this.perClick += total;
     this.perClickElement.innerHTML = String(this.perClick);
@@ -228,8 +228,7 @@ class Item {
     this.itemDesc = itemDesc;
     this.itemPrice = itemPrice;
     this.itemImg = itemImg;
-
-    // インスタンス
+    // 以下インスタンス
     this.user = user;
     this.hamburger = hamburger;
     this.etf = etf;
@@ -285,7 +284,7 @@ class Item {
   }
 
   createModalPage() {
-    Page.addPage(config.modal);
+    Page.showPage(config.modal);
 
     config.modal.innerHTML = `
     <div class="hamburger-game_modal_list-wrapper">
@@ -339,16 +338,16 @@ class Item {
     `;
   }
 
-  totalChecker(total) {
+  canAfford(total) {
     if (this.user.userMoney < total) {
       alert("所持金が足りません。");
-      return true;
+      return false;
     }
 
-    return false;
+    return true;
   }
 
-  quantityChecker(quantity) {
+  canPurchaseQuantity(quantity) {
     try {
       if (quantity <= 0) throw "1個以上購入してください。";
       else if (quantity > this.itemMax)
@@ -357,18 +356,18 @@ class Item {
         throw "個数と今までの購入数の合計が最大可能購入数より大きいです。";
     } catch (error) {
       alert(error);
-      return true;
+      return false;
     }
 
-    return false;
+    return true;
   }
 
   processThePurchase() {
     const quantity = Number(document.getElementById("modalInput").value);
-    if (this.quantityChecker(quantity)) return false;
+    if (!this.canPurchaseQuantity(quantity)) return false;
 
     const total = this.itemPrice * quantity;
-    if (this.totalChecker(total)) return false;
+    if (!this.canAfford(total)) return false;
 
     if (this.itemType === "ability") {
       this.hamburger.addPerClick(this.itemEffect, quantity);
@@ -386,7 +385,7 @@ class Item {
     // アイテム購入数を更新
     this.purchaseNumber += quantity;
 
-    Page.removePage(config.modal);
+    Page.hidePage(config.modal);
     config.modal.innerHTML = "";
   }
 
@@ -394,6 +393,7 @@ class Item {
     const purchaseBtn = document.getElementById("purchaseBtn");
 
     purchaseBtn.addEventListener("click", () => {
+      if (!confirm("購入しますか？")) return false;
       this.processThePurchase();
     });
   }
@@ -402,7 +402,7 @@ class Item {
     const backBtn = document.getElementById("backBtn");
 
     backBtn.addEventListener("click", () => {
-      Page.removePage(config.modal);
+      Page.hidePage(config.modal);
       config.modal.innerHTML = "";
     });
   }
@@ -413,7 +413,7 @@ class Game {
     const resetBtn = document.getElementById("resetBtn");
 
     resetBtn.addEventListener("click", () => {
-      if (!confirm("ゲーム進行状況をリセットしますか?")) return false;
+      if (!confirm("ゲーム進行状況をリセットしますか？")) return false;
 
       alert("ゲーム進行状況をリセットしました。");
 
@@ -440,18 +440,16 @@ class Game {
     const saveBtn = document.getElementById("saveBtn");
 
     saveBtn.addEventListener("click", () => {
-      if (!confirm("ゲーム進行状況をセーブしますか?")) return false;
-      console.log("ゲーム進行状況をセーブする処理を実装中。");
+      if (!confirm("ゲーム進行状況をセーブしますか？")) return false;
+
+      alert("ゲーム進行状況をセーブしました。");
 
       Game.saveGameDataToJson(userName, userInfo, etf, hamburger, items);
     });
   }
 
-  static startNewGame(enteredName) {
-    const userInfo = new User(enteredName, 20, 0, 50000);
-    const etf = new ETF(0, 0, 0, userInfo);
-    const hamburger = new Hamburger(0, 25, userInfo);
-    const items = [
+  static createItems(userInfo, hamburger, etf) {
+    return [
       new Item(
         "Flip machine",
         "ability",
@@ -585,19 +583,30 @@ class Game {
         etf
       ),
     ];
-
-    Page.removePage(config.top);
-    Page.addPage(config.game);
-
-    Game.initializeGame(userInfo, etf, hamburger, items);
-    Game.saveGame(enteredName, userInfo, etf, hamburger, items);
   }
 
-  static loadGame(enteredName) {
-    const gameData = JSON.parse(localStorage.getItem(enteredName));
+  static startGame(userName, userInfo, etf, hamburger, items) {
+    Page.hidePage(config.top);
+    Page.showPage(config.game);
+
+    Game.initializeGame(userInfo, etf, hamburger, items);
+    Game.saveGame(userName, userInfo, etf, hamburger, items);
+  }
+
+  static newGame(userName) {
+    const userInfo = new User(userName, 20, 0, 50000);
+    const etf = new ETF(0, 0, 0, userInfo);
+    const hamburger = new Hamburger(0, 25, userInfo);
+    const items = Game.createItems(userInfo, hamburger, etf);
+
+    Game.startGame(userName, userInfo, etf, hamburger, items);
+  }
+
+  static loadGame(userName) {
+    const gameData = JSON.parse(localStorage.getItem(userName));
 
     const userInfo = new User(
-      enteredName,
+      userName,
       gameData.userInfo.userAge,
       gameData.userInfo.userDays,
       gameData.userInfo.userMoney
@@ -619,6 +628,7 @@ class Game {
     const items = [];
 
     gameData.items.forEach((item) => {
+      // InfinityはJsonに保存するとnullになるので、nullだった場合、Infinityにする
       if (item.itemMax == null) item.itemMax = Infinity;
 
       const itemInstance = new Item(
@@ -639,15 +649,11 @@ class Game {
       items.push(itemInstance);
     });
 
-    Page.removePage(config.top);
-    Page.addPage(config.game);
-
-    Game.initializeGame(userInfo, etf, hamburger, items);
-    Game.saveGame(enteredName, userInfo, etf, hamburger, items);
+    Game.startGame(userName, userInfo, etf, hamburger, items);
   }
 
   static isEmpty(value) {
-    if (value == "") {
+    if (value === "") {
       alert("名前を入力してください。");
       return true;
     }
@@ -657,22 +663,6 @@ class Game {
 
   static dataExist(enteredName) {
     return JSON.parse(localStorage.getItem(enteredName)) !== null;
-  }
-
-  static pushNewBtn() {
-    const newBtn = document.getElementById("newBtn");
-
-    newBtn.addEventListener("click", () => {
-      const enteredName = document.getElementById("inputName").value;
-
-      if (Game.isEmpty(enteredName)) return false;
-      if (Game.dataExist(enteredName)) {
-        alert("入力した名前のデータは既に存在しています。");
-        return false;
-      }
-
-      Game.startNewGame(enteredName);
-    });
   }
 
   static pushLoginBtn() {
@@ -690,7 +680,23 @@ class Game {
       Game.loadGame(enteredName);
     });
   }
+
+  static pushNewBtn() {
+    const newBtn = document.getElementById("newBtn");
+
+    newBtn.addEventListener("click", () => {
+      const enteredName = document.getElementById("inputName").value;
+
+      if (Game.isEmpty(enteredName)) return false;
+      if (Game.dataExist(enteredName)) {
+        alert("入力した名前のデータは既に存在しています。");
+        return false;
+      }
+
+      Game.newGame(enteredName);
+    });
+  }
 }
 
-Game.pushLoginBtn();
 Game.pushNewBtn();
+Game.pushLoginBtn();

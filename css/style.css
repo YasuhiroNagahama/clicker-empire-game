@@ -97,7 +97,7 @@ body {
 }
 
 .hamburger-game_shop_list {
-  max-height: 400px;
+  max-height: 600px;
   overflow-y: scroll;
   overscroll-behavior: contain;
 }
